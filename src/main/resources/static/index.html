@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management System</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 15px;
+        }
+
+        .nav-item button {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1em;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-item button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .nav-item button.active {
+            background: rgba(255,255,255,0.3);
+            border-left: 4px solid white;
+            padding-left: 11px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            color: #333;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .search-bar {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 250px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-left: 4px solid #667eea;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+        }
+
+        .stat-card.doctors { border-left-color: #4CAF50; }
+        .stat-card.patients { border-left-color: #2196F3; }
+        .stat-card.appointments { border-left-color: #FF9800; }
+        .stat-card.revenue { border-left-color: #9C27B0; }
+
+        .stat-card h3 {
+            color: #999;
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .stat-change {
+            font-size: 0.9em;
+            color: #4CAF50;
+        }
+
+        /* Charts Container */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .chart-container h3 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.2em;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Tables */
+        .table-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .table-container h3 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.2em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tbody tr:hover { background: #f8f9fa; }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .status-active { background: #c8e6c9; color: #2e7d32; }
+        .status-pending { background: #ffe0b2; color: #e65100; }
+        .status-completed { background: #bbdefb; color: #1565c0; }
+        .status-cancelled { background: #ffcdd2; color: #c62828; }
+
+        /* Doctor Schedule */
+        .doctors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .doctor-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-top: 4px solid #667eea;
+        }
+
+        .doctor-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .doctor-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .doctor-info h4 { margin-bottom: 5px; color: #333; }
+        .doctor-specialty { color: #999; font-size: 0.9em; }
+
+        .availability {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .availability-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4CAF50;
+        }
+
+        .availability-dot.unavailable { background: #f44336; }
+
+        /* Forms */
+        .form-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.2em;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-danger { background: #f44336; }
+        .btn-danger:hover { background: #d32f2f; }
+        .btn-small { padding: 8px 15px; font-size: 0.9em; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 80px; }
+            .sidebar .logo, .nav-item button span { display: none; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">🏥 HMS</div>
+            <ul class="nav-menu">
+                <li class="nav-item"><button onclick="showSection('dashboard')" class="active">📊 <span>Dashboard</span></button></li>
+                <li class="nav-item"><button onclick="showSection('doctors')">👨‍⚕️ <span>Doctors</span></button></li>
+                <li class="nav-item"><button onclick="showSection('patients')">👥 <span>Patients</span></button></li>
+                <li class="nav-item"><button onclick="showSection('appointments')">📅 <span>Appointments</span></button></li>
+                <li class="nav-item"><button onclick="showSection('reports')">📈 <span>Reports</span></button></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <h1 id="pageTitle">Dashboard</h1>
+                <div class="header-right">
+                    <input type="text" class="search-bar" placeholder="Search...">
+                    <div class="user-info">
+                        <div class="user-avatar">👤</div>
+                        <span>Admin</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Dashboard Section -->
+                <div id="dashboard" class="section active">
+                    <!-- Statistics -->
+                    <div class="stats-grid">
+                        <div class="stat-card doctors">
+                            <h3>Total Doctors</h3>
+                            <div class="stat-value" id="totalDoctorsValue">0</div>
+                            <div class="stat-change">👨‍⚕️ Active & Available</div>
+                        </div>
+                        <div class="stat-card patients">
+                            <h3>Total Patients</h3>
+                            <div class="stat-value" id="totalPatientsValue">0</div>
+                            <div class="stat-change">👥 Under Treatment</div>
+                        </div>
+                        <div class="stat-card appointments">
+                            <h3>Appointments Today</h3>
+                            <div class="stat-value" id="appointmentsTodayValue">0</div>
+                            <div class="stat-change">📅 Scheduled</div>
+                        </div>
+                        <div class="stat-card revenue">
+                            <h3>System Status</h3>
+                            <div class="stat-value" style="color: #4CAF50;">✓</div>
+                            <div class="stat-change">All Systems Operational</div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <h3>Patient Status Distribution</h3>
+                            <div class="chart-wrapper"><canvas id="patientStatusChart"></canvas></div>
+                        </div>
+                        <div class="chart-container">
+                            <h3>Appointments by Specialization</h3>
+                            <div class="chart-wrapper"><canvas id="specializationChart"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- Available Doctors -->
+                    <div class="table-container">
+                        <h3>👨‍⚕️ Available Doctors Today</h3>
+                        <div class="doctors-grid" id="availableDoctorsGrid"></div>
+                    </div>
+
+                    <!-- Recent Appointments -->
+                    <div class="table-container">
+                        <h3>📅 Recent Appointments</h3>
+                        <table id="recentAppointmentsTable">
+                            <thead>
+                                <tr>
+                                    <th>Patient</th>
+                                    <th>Doctor</th>
+                                    <th>Date & Time</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="appointmentTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Doctors Section -->
+                <div id="doctors" class="section">
+                    <div class="form-section">
+                        <h3>➕ Add New Doctor</h3>
+                        <div class="form-row">
+                            <div class="form-group"><label>Name:</label><input type="text" id="doctorName" placeholder="Dr. Full Name"></div>
+                            <div class="form-group"><label>Email:</label><input type="email" id="doctorEmail" placeholder="doctor@hospital.com"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Phone:</label><input type="tel" id="doctorPhone" placeholder="9876543210"></div>
+                            <div class="form-group"><label>Age:</label><input type="number" id="doctorAge" placeholder="Age"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Specialization:</label><input type="text" id="doctorSpecialization" placeholder="e.g., Cardiology"></div>
+                            <div class="form-group"><label>Salary (Annual):</label><input type="number" id="doctorSalary" placeholder="150000"></div>
+                        </div>
+                        <button class="btn" onclick="addDoctor()">Add Doctor</button>
+                    </div>
+
+                    <div class="table-container">
+                        <h3>👨‍⚕️ All Doctors</h3>
+                        <table id="doctorTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Specialization</th>
+                                    <th>Salary</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="doctorTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Patients Section -->
+                <div id="patients" class="section">
+                    <div class="form-section">
+                        <h3>➕ Add New Patient</h3>
+                        <div class="form-row">
+                            <div class="form-group"><label>Name:</label><input type="text" id="patientName" placeholder="Patient Full Name"></div>
+                            <div class="form-group"><label>Email:</label><input type="email" id="patientEmail" placeholder="patient@email.com"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Phone:</label><input type="tel" id="patientPhone" placeholder="9988776655"></div>
+                            <div class="form-group"><label>Age:</label><input type="number" id="patientAge" placeholder="Age"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Medical Record Number:</label><input type="text" id="patientMRN" placeholder="MRN001"></div>
+                            <div class="form-group"><label>Blood Group:</label><select id="patientBlood"><option value="">Select Blood Group</option><option value="O+">O+</option><option value="O-">O-</option><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option></select></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Diagnosis:</label><input type="text" id="patientDiagnosis" placeholder="e.g., Hypertension"></div>
+                            <div class="form-group"><label>Status:</label><select id="patientStatus"><option value="Admitted">Admitted</option><option value="Discharged">Discharged</option><option value="In Treatment">In Treatment</option></select></div>
+                        </div>
+                        <button class="btn" onclick="addPatient()">Add Patient</button>
+                    </div>
+
+                    <div class="table-container">
+                        <h3>👥 All Patients</h3>
+                        <table id="patientTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>MRN</th>
+                                    <th>Blood Group</th>
+                                    <th>Diagnosis</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="patientTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Appointments Section -->
+                <div id="appointments" class="section">
+                    <div class="form-section">
+                        <h3>📅 Schedule New Appointment</h3>
+                        <div class="form-row">
+                            <div class="form-group"><label>Patient ID:</label><input type="number" id="appointmentPatientId" placeholder="Patient ID"></div>
+                            <div class="form-group"><label>Doctor ID:</label><input type="number" id="appointmentDoctorId" placeholder="Doctor ID"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Date & Time:</label><input type="datetime-local" id="appointmentDateTime"></div>
+                            <div class="form-group"><label>Status:</label><select id="appointmentStatus"><option value="Scheduled">Scheduled</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option></select></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Reason for Appointment:</label><input type="text" id="appointmentReason" placeholder="e.g., Regular Checkup"></div>
+                        </div>
+                        <button class="btn" onclick="scheduleAppointment()">Schedule Appointment</button>
+                    </div>
+
+                    <div class="table-container">
+                        <h3>📅 All Appointments</h3>
+                        <table id="appointmentTable">
+                            <thead>
+                                <tr>
+                                    <th>Patient ID</th>
+                                    <th>Doctor ID</th>
+                                    <th>Date & Time</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="appointmentFullTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Reports Section -->
+                <div id="reports" class="section">
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <h3>Doctor Performance</h3>
+                            <div class="chart-wrapper"><canvas id="doctorPerformanceChart"></canvas></div>
+                        </div>
+                        <div class="chart-container">
+                            <h3>Monthly Appointments Trend</h3>
+                            <div class="chart-wrapper"><canvas id="appointmentTrendChart"></canvas></div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <h3>📊 Hospital Statistics</h3>
+                        <table>
+                            <thead>
+                                <tr><th>Metric</th><th>Value</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Total Doctors</td><td id="statsTotal Doctors">0</td></tr>
+                                <tr><td>Total Patients</td><td id="statsTotal Patients">0</td></tr>
+                                <tr><td>Total Appointments</td><td id="statsTotal Appointments">0</td></tr>
+                                <tr><td>Available Doctors</td><td id="statsAvailable">0</td></tr>
+                                <tr><td>Admitted Patients</td><td id="statsAdmitted">0</td></tr>
+                                <tr><td>Completed Appointments</td><td id="statsCompleted">0</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+        let doctors = [];
+        let patients = [];
+        let appointments = [];
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            
+            document.querySelectorAll('.nav-item button').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const titles = {
+                dashboard: 'Dashboard',
+                doctors: 'Doctor Management',
+                patients: 'Patient Management',
+                appointments: 'Appointment Management',
+                reports: 'Reports & Analytics'
+            };
+            document.getElementById('pageTitle').textContent = titles[sectionId];
+
+            if (sectionId === 'dashboard') loadDashboard();
+            else if (sectionId === 'doctors') loadDoctors();
+            else if (sectionId === 'patients') loadPatients();
+            else if (sectionId === 'appointments') loadAppointments();
+            else if (sectionId === 'reports') loadReports();
+        }
+
+        function loadDashboard() {
+            fetch(`${API_BASE}/doctors`).then(r => r.json()).then(d => {
+                doctors = d;
+                document.getElementById('totalDoctorsValue').textContent = d.length;
+                loadAvailableDoctors();
+            });
+            fetch(`${API_BASE}/patients`).then(r => r.json()).then(d => {
+                patients = d;
+                document.getElementById('totalPatientsValue').textContent = d.length;
+                renderPatientStatusChart();
+            });
+            fetch(`${API_BASE}/appointments`).then(r => r.json()).then(d => {
+                appointments = d;
+                document.getElementById('appointmentsTodayValue').textContent = d.length;
+                renderRecentAppointments(d.slice(0, 5));
+                renderSpecializationChart();
+            });
+        }
+
+        function loadAvailableDoctors() {
+            const grid = document.getElementById('availableDoctorsGrid');
+            grid.innerHTML = '';
+            doctors.filter(d => d.isAvailable).forEach(doc => {
+                grid.innerHTML += `
+                    <div class="doctor-card">
+                        <div class="doctor-header">
+                            <div class="doctor-avatar">${doc.name.charAt(0)}</div>
+                            <div class="doctor-info">
+                                <h4>${doc.name}</h4>
+                                <div class="doctor-specialty">${doc.specialization}</div>
+                            </div>
+                        </div>
+                        <div style="color: #999; font-size: 0.9em; margin-bottom: 10px;">📧 ${doc.email}</div>
+                        <div style="color: #999; font-size: 0.9em; margin-bottom: 10px;">💼 Rs ${doc.salary}/year</div>
+                        <div class="availability">
+                            <div class="availability-dot"></div>
+                            <span>Available Now</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderRecentAppointments(apts) {
+            const tbody = document.getElementById('appointmentTableBody');
+            tbody.innerHTML = '';
+            apts.forEach(apt => {
+                const statusColor = {'Scheduled': 'status-pending', 'Completed': 'status-completed', 'Cancelled': 'status-cancelled'};
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${apt.patient ? apt.patient.name : 'N/A'}</td>
+                        <td>${apt.doctor ? apt.doctor.name : 'N/A'}</td>
+                        <td>${apt.appointmentDateTime}</td>
+                        <td>${apt.reason}</td>
+                        <td><span class="status-badge ${statusColor[apt.status]}">${apt.status}</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderPatientStatusChart() {
+            const admitted = patients.filter(p => p.status === 'Admitted').length;
+            const discharged = patients.filter(p => p.status === 'Discharged').length;
+            const inTreatment = patients.filter(p => p.status === 'In Treatment').length;
+
+            const ctx = document.getElementById('patientStatusChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Admitted', 'Discharged', 'In Treatment'],
+                    datasets: [{data: [admitted, discharged, inTreatment], backgroundColor: ['#2196F3', '#4CAF50', '#FF9800'], borderWidth: 2, borderColor: '#fff'}]
+                },
+                options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {position: 'bottom'}}}
+            });
+        }
+
+        function renderSpecializationChart() {
+            const specs = {};
+            doctors.forEach(d => {specs[d.specialization] = (specs[d.specialization] || 0) + 1;});
+
+            const ctx = document.getElementById('specializationChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {labels: Object.keys(specs), datasets: [{label: 'Number of Doctors', data: Object.values(specs), backgroundColor: '#667eea'}]},
+                options: {responsive: true, maintainAspectRatio: false, scales: {y: {beginAtZero: true}}}
+            });
+        }
+
+        function loadDoctors() {
+            fetch(`${API_BASE}/doctors`).then(r => r.json()).then(d => {
+                doctors = d;
+                const tbody = document.getElementById('doctorTableBody');
+                tbody.innerHTML = '';
+                d.forEach(doc => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${doc.name}</td>
+                            <td>${doc.email}</td>
+                            <td>${doc.specialization}</td>
+                            <td>Rs ${doc.salary}</td>
+                            <td><span class="status-badge ${doc.isAvailable ? 'status-active' : 'status-pending'}">${doc.isAvailable ? 'Available' : 'Busy'}</span></td>
+                            <td><button class="btn btn-small btn-danger" onclick="deleteDoctor(${doc.id})">Delete</button></td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
+        function addDoctor() {
+            const doctor = {
+                name: document.getElementById('doctorName').value,
+                email: document.getElementById('doctorEmail').value,
+                phone: document.getElementById('doctorPhone').value,
+                age: parseInt(document.getElementById('doctorAge').value),
+                specialization: document.getElementById('doctorSpecialization').value,
+                salary: parseFloat(document.getElementById('doctorSalary').value),
+                isAvailable: true
+            };
+            fetch(`${API_BASE}/doctors`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(doctor)})
+                .then(r => r.json()).then(() => {
+                    document.querySelectorAll('#doctors input').forEach(inp => inp.value = '');
+                    loadDoctors();
+                });
+        }
+
+        function deleteDoctor(id) {
+            if (confirm('Delete this doctor?')) {
+                fetch(`${API_BASE}/doctors/${id}`, {method: 'DELETE'}).then(() => loadDoctors());
+            }
+        }
+
+        function loadPatients() {
+            fetch(`${API_BASE}/patients`).then(r => r.json()).then(d => {
+                patients = d;
+                const tbody = document.getElementById('patientTableBody');
+                tbody.innerHTML = '';
+                d.forEach(pat => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${pat.name}</td>
+                            <td>${pat.email}</td>
+                            <td>${pat.medicalRecordNumber}</td>
+                            <td>${pat.bloodGroup}</td>
+                            <td>${pat.diagnosis}</td>
+                            <td><span class="status-badge ${pat.status === 'Admitted' ? 'status-pending' : 'status-completed'}">${pat.status}</span></td>
+                            <td><button class="btn btn-small btn-danger" onclick="deletePatient(${pat.id})">Delete</button></td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
+        function addPatient() {
+            const patient = {
+                name: document.getElementById('patientName').value,
+                email: document.getElementById('patientEmail').value,
+                phone: document.getElementById('patientPhone').value,
+                age: parseInt(document.getElementById('patientAge').value),
+                medicalRecordNumber: document.getElementById('patientMRN').value,
+                bloodGroup: document.getElementById('patientBlood').value,
+                diagnosis: document.getElementById('patientDiagnosis').value,
+                status: document.getElementById('patientStatus').value
+            };
+            fetch(`${API_BASE}/patients`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(patient)})
+                .then(r => r.json()).then(() => {
+                    document.querySelectorAll('#patients input, #patients textarea').forEach(inp => inp.value = '');
+                    loadPatients();
+                });
+        }
+
+        function deletePatient(id) {
+            if (confirm('Delete this patient?')) {
+                fetch(`${API_BASE}/patients/${id}`, {method: 'DELETE'}).then(() => loadPatients());
+            }
+        }
+
+        function loadAppointments() {
+            fetch(`${API_BASE}/appointments`).then(r => r.json()).then(d => {
+                appointments = d;
+                const tbody = document.getElementById('appointmentFullTableBody');
+                tbody.innerHTML = '';
+                d.forEach(apt => {
+                    const statusColor = {'Scheduled': 'status-pending', 'Completed': 'status-completed', 'Cancelled': 'status-cancelled'};
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${apt.patient ? apt.patient.id : 'N/A'}</td>
+                            <td>${apt.doctor ? apt.doctor.id : 'N/A'}</td>
+                            <td>${apt.appointmentDateTime}</td>
+                            <td>${apt.reason}</td>
+                            <td><span class="status-badge ${statusColor[apt.status]}">${apt.status}</span></td>
+                            <td><button class="btn btn-small btn-danger" onclick="cancelAppointment(${apt.id})">Cancel</button></td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
+        function scheduleAppointment() {
+            const appointment = {
+                patient: {id: parseInt(document.getElementById('appointmentPatientId').value)},
+                doctor: {id: parseInt(document.getElementById('appointmentDoctorId').value)},
+                appointmentDateTime: document.getElementById('appointmentDateTime').value,
+                reason: document.getElementById('appointmentReason').value,
+                status: document.getElementById('appointmentStatus').value
+            };
+            fetch(`${API_BASE}/appointments`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(appointment)})
+                .then(r => r.json()).then(() => {
+                    document.querySelectorAll('#appointments input, #appointments textarea').forEach(inp => inp.value = '');
+                    loadAppointments();
+                });
+        }
+
+        function cancelAppointment(id) {
+            if (confirm('Cancel this appointment?')) {
+                fetch(`${API_BASE}/appointments/${id}/cancel`, {method: 'PUT'}).then(() => loadAppointments());
+            }
+        }
+
+        function loadReports() {
+            renderDoctorPerformanceChart();
+            renderAppointmentTrendChart();
+            updateStatistics();
+        }
+
+        function renderDoctorPerformanceChart() {
+            const ctx = document.getElementById('doctorPerformanceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: doctors.slice(0, 5).map(d => d.name),
+                    datasets: [{
+                        label: 'Appointments',
+                        data: doctors.slice(0, 5).map((d, i) => appointments.filter(a => a.doctor && a.doctor.id === d.id).length),
+                        backgroundColor: '#667eea'
+                    }]
+                },
+                options: {responsive: true, maintainAspectRatio: false, scales: {y: {beginAtZero: true}}}
+            });
+        }
+
+        function renderAppointmentTrendChart() {
+            const ctx = document.getElementById('appointmentTrendChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    datasets: [{
+                        label: 'Appointments',
+                        data: [appointments.length * 0.8, appointments.length * 0.9, appointments.length, appointments.length * 1.1],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {responsive: true, maintainAspectRatio: false}
+            });
+        }
+
+        function updateStatistics() {
+            document.getElementById('statsTotal Doctors').textContent = doctors.length;
+            document.getElementById('statsTotal Patients').textContent = patients.length;
+            document.getElementById('statsTotal Appointments').textContent = appointments.length;
+            document.getElementById('statsAvailable').textContent = doctors.filter(d => d.isAvailable).length;
+            document.getElementById('statsAdmitted').textContent = patients.filter(p => p.status === 'Admitted').length;
+            document.getElementById('statsCompleted').textContent = appointments.filter(a => a.status === 'Completed').length;
+        }
+
+        window.onload = loadDashboard;
+    </script>
+</body>
+</html>
