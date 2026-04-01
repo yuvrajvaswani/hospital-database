@@ -1,295 +1,236 @@
-# Hospital Management System
+# 🏥 Hospital Management System
 
-A comprehensive Java-based Hospital Management System demonstrating professional software engineering practices with OOP principles, JDBC database connectivity, and layered architecture.
+A full-stack **Spring Boot** web application for managing hospital operations — doctors, patients, appointments, and analytics — built with Java, Spring Data JPA, H2 (in-memory) database, and a responsive single-page frontend.
 
-## Project Overview
+[![Java](https://img.shields.io/badge/Java-21-orange)](https://adoptium.net/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.0-brightgreen)](https://spring.io/projects/spring-boot)
+[![H2 Database](https://img.shields.io/badge/Database-H2%20%2F%20MySQL-blue)](https://www.h2database.com/)
+[![Maven](https://img.shields.io/badge/Build-Maven-red)](https://maven.apache.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-This system manages hospital operations including:
-- Doctor management
-- Patient management  
-- Appointment scheduling
-- Medical records tracking
+---
 
-## Technologies Used
+## 🚀 Live Demo
 
-- **Language**: Java 11+
-- **Database**: MySQL
-- **Build Tool**: Maven
-- **Database Driver**: MySQL JDBC Connector
-- **Architecture**: Layered (Presentation, Business Logic, Data Access, Database)
+> Run it locally in under 2 minutes — no database setup required (uses H2 in-memory DB).
 
-## Project Structure
+```bash
+# Clone the repo
+git clone https://github.com/yuvrajvaswani/hospital-database.git
+cd hospital-database
+
+# Run with Maven
+mvn spring-boot:run -f pom-springboot.xml
+```
+
+Then open **http://localhost:8080** in your browser.
+
+---
+
+## 📸 Screenshots
+
+### Dashboard
+![Dashboard](screenshots/01_dashboard.png)
+> Real-time stats: total doctors, patients, today's appointments, and interactive charts (patient status distribution + appointments by specialization).
+
+### Doctor Management
+![Doctors](screenshots/02_doctors.png)
+> Add new doctors, view all doctors with specialization, salary, and availability status. Full CRUD via REST API.
+
+### Patient Management
+![Patients](screenshots/03_patients.png)
+> Register patients, track admission status (Admitted / In Treatment / Discharged), and manage patient records.
+
+### Appointment Scheduling
+![Appointments](screenshots/04_appointments.png)
+> Schedule appointments between patients and doctors, set date/time, reason, and status. Cancel appointments from the table view.
+
+### Reports & Analytics
+![Reports](screenshots/05_reports.png)
+> Visual analytics with charts for patient trends and appointment summaries.
+
+---
+
+## ✨ Features
+
+- **Dashboard** — live stats cards + Chart.js donut & bar charts
+- **Doctor Management** — CRUD operations, specialization, salary, availability toggle
+- **Patient Management** — registration, status tracking (Admitted / In Treatment / Discharged)
+- **Appointment Scheduling** — book, view, and cancel appointments with reason tracking
+- **REST API** — full JSON API at `/api/doctors`, `/api/patients`, `/api/appointments`
+- **Auto-seeded data** — sample doctors, patients, and appointments loaded on startup
+- **No external DB needed** — uses H2 in-memory database by default (swap for MySQL in config)
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Language | Java 21 |
+| Framework | Spring Boot 3.0 |
+| ORM | Spring Data JPA / Hibernate |
+| Database | H2 (dev) / MySQL (prod) |
+| Build | Maven |
+| Frontend | HTML5, CSS3, Vanilla JS, Chart.js |
+| Architecture | Layered MVC (Controller → Service → Repository) |
+
+## 📁 Project Structure
 
 ```
 HospitalManagementSystem/
 ├── src/main/java/com/hospital/
-│   ├── HospitalManagementApp.java (Main entry point)
-│   ├── model/               (Domain models)
-│   │   ├── Person.java      (Abstract base class)
-│   │   ├── Doctor.java      (Inheritance, Polymorphism)
-│   │   ├── Patient.java     (Inheritance)
-│   │   ├── Nurse.java       (Inheritance)
-│   │   └── Appointment.java (Composition)
-│   ├── dao/                 (Data Access Layer)
-│   │   ├── IGenericDAO.java (Interface abstraction)
-│   │   ├── DoctorDAO.java   (CRUD operations)
-│   │   ├── PatientDAO.java  (CRUD operations)
-│   │   └── AppointmentDAO.java (CRUD operations)
-│   ├── business/            (Business Logic Layer)
+│   ├── HospitalManagementApplication.java   ← Spring Boot entry point
+│   ├── config/
+│   │   └── DataLoader.java                  ← Seeds sample data on startup
+│   ├── controller/                          ← REST API endpoints
+│   │   ├── DoctorController.java
+│   │   ├── PatientController.java
+│   │   └── AppointmentController.java
+│   ├── model/                               ← JPA entities
+│   │   ├── Doctor.java
+│   │   ├── Patient.java
+│   │   └── Appointment.java
+│   ├── repository/                          ← Spring Data JPA repositories
+│   │   ├── DoctorRepository.java
+│   │   ├── PatientRepository.java
+│   │   └── AppointmentRepository.java
+│   ├── service/                             ← Business logic layer
 │   │   ├── DoctorService.java
 │   │   ├── PatientService.java
 │   │   └── AppointmentService.java
-│   ├── presentation/        (Presentation Layer)
-│   │   └── ConsoleUI.java   (User Interface)
-│   └── util/                (Utility classes)
-│       ├── DatabaseConnection.java (Singleton pattern)
-│       ├── Validator.java         (Input validation)
-│       └── ValidationException.java (Custom exception)
+│   └── util/
+│       ├── DatabaseConnection.java          ← Singleton pattern
+│       ├── Validator.java                   ← Input validation
+│       └── ValidationException.java         ← Custom exception
+├── src/main/resources/
+│   ├── application.properties               ← Spring Boot config (H2/MySQL)
+│   └── static/index.html                   ← Single-page frontend
 ├── database/
-│   └── hospital_db_schema.sql (Database schema, views, procedures)
-├── pom.xml                  (Maven configuration)
-└── README.md
-
+│   └── hospital_db_schema.sql              ← MySQL schema + stored procedures
+├── pom-springboot.xml                      ← Spring Boot Maven config
+└── pom.xml                                 ← Standalone JDBC Maven config
 ```
 
-## OOP Concepts Demonstrated
-
-### 1. **Classes and Objects**
-- Multiple entity classes representing real-world objects
-- Proper instantiation and object manipulation
-
-### 2. **Encapsulation**
-- Private fields with public getters/setters
-- Data hiding and controlled access
-- See: `Person.java`, `Doctor.java`, `Patient.java`, `Nurse.java`, `Appointment.java`
-
-### 3. **Inheritance**
-- Single inheritance hierarchy
-- `Person` (abstract base class) → `Doctor`, `Patient`, `Nurse`
-- Inherited methods and properties
-
-### 4. **Polymorphism**
-- **Method Overriding**: `getRole()`, `getAnnualSalary()` overridden in child classes
-- **Method Overloading**: `updateAvailability()` in Doctor class with different parameters
-
-### 5. **Abstraction**
-- Abstract class `Person` with abstract methods
-- Interface `IGenericDAO<T>` for generic DAO operations
-- Implementation classes for specific DAOs
-
-### 6. **Collections**
-- `ArrayList<Doctor>`, `ArrayList<Patient>`, `ArrayList<Appointment>` for storing objects
-- HashMap-like collections in service layer for caching
-
-## Database Design
-
-### Tables
-1. **doctors** - Medical professionals
-2. **patients** - Patients admitted/treated
-3. **nurses** - Nursing staff
-4. **appointments** - Patient-Doctor appointments
-
-### Key Features
-- Primary keys and foreign keys
-- Constraints (CHECK, UNIQUE, NOT NULL)
-- Indexes for performance optimization
-- Stored procedures for complex queries
-- Views for data abstraction
-
-## CRUD Operations
-
-All CRUD operations implemented using JDBC PreparedStatements:
-
-### Create
-```java
-public boolean create(Doctor doctor) throws Exception
-```
-
-### Read
-```java
-public Doctor read(int id) throws Exception
-public List<Doctor> readAll() throws Exception
-```
-
-### Update
-```java
-public boolean update(Doctor doctor) throws Exception
-```
-
-### Delete
-```java
-public boolean delete(int id) throws Exception
-```
-
-## Exception Handling
-
-- Custom `ValidationException` for validation errors
-- Try-catch blocks for database operations
-- Comprehensive error messages
-- Input validation with detailed error feedback
-- SQL exception handling with meaningful messages
-
-## Installation & Setup
+## ⚙️ Getting Started
 
 ### Prerequisites
-- Java 11 or higher
-- MySQL 5.7 or higher
-- Maven 3.6 or higher
 
-### Step 1: Create Database
+- Java 11+ (Java 21 recommended)
+- Maven 3.6+
+- No database setup required (H2 in-memory DB included)
+
+### Run Locally
+
 ```bash
-mysql -u root -p < database/hospital_db_schema.sql
+# 1. Clone the repository
+git clone https://github.com/yuvrajvaswani/hospital-database.git
+cd hospital-database
+
+# 2. Start the application
+mvn spring-boot:run -f pom-springboot.xml
+
+# 3. Open in browser
+# http://localhost:8080
 ```
 
-### Step 2: Configure Database Connection
-Edit `src/main/java/com/hospital/util/DatabaseConnection.java`:
-```java
-private static final String DB_URL = "jdbc:mysql://localhost:3306/hospital_management_system";
-private static final String DB_USER = "root";
-private static final String DB_PASSWORD = "root"; // Change password if needed
+The app auto-seeds sample data (3 doctors, 3 patients, 1 appointment) on first run.
+
+### Switch to MySQL (Optional)
+
+Edit `src/main/resources/application.properties`:
+
+```properties
+# Comment out H2 config and uncomment below:
+spring.datasource.url=jdbc:mysql://localhost:3306/hospital_db
+spring.datasource.username=root
+spring.datasource.password=yourpassword
+spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
+spring.jpa.hibernate.ddl-auto=update
 ```
 
-### Step 3: Build Project
+Then run the schema: `mysql -u root -p < database/hospital_db_schema.sql`
+
+---
+
+## 🔌 REST API Endpoints
+
+### Doctors
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/doctors` | Get all doctors |
+| GET | `/api/doctors/{id}` | Get doctor by ID |
+| POST | `/api/doctors` | Add a new doctor |
+| PUT | `/api/doctors/{id}` | Update doctor |
+| DELETE | `/api/doctors/{id}` | Delete doctor |
+
+### Patients
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/patients` | Get all patients |
+| GET | `/api/patients/{id}` | Get patient by ID |
+| POST | `/api/patients` | Register a patient |
+| PUT | `/api/patients/{id}` | Update patient |
+| DELETE | `/api/patients/{id}` | Delete patient |
+
+### Appointments
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/appointments` | Get all appointments |
+| POST | `/api/appointments` | Schedule appointment |
+| DELETE | `/api/appointments/{id}` | Cancel appointment |
+
+---
+
+## 🧠 OOP Concepts Demonstrated
+
+| Concept | Where Used |
+|---------|-----------|
+| **Encapsulation** | Private fields + getters/setters in all model classes |
+| **Inheritance** | `Doctor`, `Patient` extend base entity patterns |
+| **Abstraction** | `IGenericDAO<T>` interface, abstract service contracts |
+| **Polymorphism** | Method overriding in service layer |
+| **Singleton** | `DatabaseConnection.java` |
+| **Composition** | `Appointment` references both `Doctor` and `Patient` |
+
+---
+
+## 🗄️ Database Schema
+
+Four relational tables with foreign keys, indexes, constraints, views, and stored procedures:
+
+```
+doctors        — id, name, email, phone, age, specialization, salary, available
+patients       — id, name, email, phone, age, bloodGroup, status, admissionDate
+appointments   — id, patientId (FK), doctorId (FK), dateTime, reason, status
+```
+
+---
+
+## 📦 Build & Package
+
 ```bash
-mvn clean compile
+# Compile and package as JAR
+mvn clean package -f pom-springboot.xml -DskipTests
+
+# Run the JAR directly
+java -jar target/HospitalManagementSystem-1.0.0.jar
 ```
 
-### Step 4: Run Application
-```bash
-mvn exec:java -Dexec.mainClass="com.hospital.HospitalManagementApp"
-```
+---
 
-Or run the JAR file:
-```bash
-mvn package
-java -jar target/HospitalManagementSystem-all.jar
-```
+## 🤝 Contributing
 
-## Usage
+1. Fork the repo
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Commit your changes: `git commit -m 'Add my feature'`
+4. Push and open a Pull Request
 
-### Main Menu
-```
-1. Doctor Management
-   - Add Doctor
-   - View Doctor
-   - View All Doctors
-   - Update Doctor
-   - Delete Doctor
-   - Search by Specialization
-   - View Available Doctors
+---
 
-2. Patient Management
-   - Add Patient
-   - View Patient
-   - View All Patients
-   - Update Patient
-   - Delete Patient
-   - Admit Patient
-   - Discharge Patient
+## 📄 License
 
-3. Appointment Management
-   - Schedule Appointment
-   - View Appointment
-   - View All Appointments
-   - Cancel Appointment
-   - View Appointments by Patient
-   - View Appointments by Doctor
-
-4. Exit
-```
-
-## Example Usage
-
-### Adding a Doctor
-```
-1. Select "Doctor Management" from main menu
-2. Select "Add Doctor"
-3. Enter doctor details:
-   - First Name: Rajesh
-   - Last Name: Kumar
-   - Email: rajesh@hospital.com
-   - Phone: 9876543210
-   - Address: 123 Medical Lane
-   - DOB: 1980-05-15
-   - Specialization: Cardiology
-   - License: MED001
-   - Experience: 15 years
-   - Salary: 150000
-```
-
-### Admitting a Patient
-```
-1. Select "Patient Management"
-2. Select "Admit Patient"
-3. Enter Patient ID
-4. Enter Admission Date (YYYY-MM-DD)
-5. Enter Diagnosis
-```
-
-## Key Features
-
-### Validation Layer
-- Email format validation
-- Phone number validation (10-15 digits)
-- Blood group validation (O+, O-, A+, A-, B+, B-, AB+, AB-)
-- Date format validation (YYYY-MM-DD)
-- Salary and age validation
-
-### Search Functionality
-- Search doctors by specialization
-- Find available doctors
-- Get patient by ID
-- Find patients by status (admitted, discharged, in-recovery)
-- Retrieve appointments by patient/doctor
-
-### Database Features
-- Stored procedures for complex queries
-- Views for simplified data access
-- Indexes for query optimization
-- Cascading delete for referential integrity
-- Timestamps for audit trail
-
-## Code Quality
-
-- **Modular Design**: Clear separation of concerns
-- **Scalable Architecture**: Easy to add new features
-- **Error Handling**: Comprehensive exception handling
-- **Validation**: Input validation at business logic layer
-- **Reusability**: Generic DAO interface and abstract base classes
-- **Documentation**: JavaDoc comments and inline documentation
-
-## Testing
-
-Sample test data is included in `database/hospital_db_schema.sql`:
-- 5 Sample Doctors with various specializations
-- 5 Sample Patients with different medical conditions
-- 7 Sample Appointments
-
-Run queries manually or use the console interface to test:
-```bash
-SELECT * FROM doctors;
-SELECT * FROM patients WHERE status = 'admitted';
-SELECT * FROM appointments WHERE appointment_date = '2026-04-01';
-```
-
-## Performance Considerations
-
-- Database indexes on frequently queried columns
-- Connection pooling via singleton pattern
-- PreparedStatements to prevent SQL injection
-- Lazy loading of related data
-- Efficient object mapping from ResultSet
-
-## Bonus Features Implemented
-
-- ✅ Advanced search and filter functionality
-- ✅ Data validation rules with error messages
-- ✅ Stored procedures for complex queries
-- ✅ Views for data abstraction
-- ✅ Role-based design (Doctor, Nurse, Patient roles)
-- ✅ Custom exceptions
-- ✅ Comprehensive audit trails with timestamps
-- ✅ Scalable architecture for easy extension
+This project is licensed under the MIT License.
 
 ## Future Enhancements
 
