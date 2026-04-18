@@ -576,3 +576,4 @@ The project exceeds minimum requirements through:
 ---
 
 **END OF SUBMISSION GUIDE**
+Students must submit a project report containing:Title PageProblem StatementObjectivesSystem DesignClass DiagramDatabase SchemaScreenshots of ApplicationExplanation of OOP Concepts UsedConclusion

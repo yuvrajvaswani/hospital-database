@@ -4,6 +4,8 @@ import com.hospital.model.Appointment;
 import com.hospital.model.Doctor;
 import com.hospital.model.Patient;
 import com.hospital.repository.AppointmentRepository;
+import com.hospital.repository.DoctorRepository;
+import com.hospital.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -15,7 +17,22 @@ public class AppointmentService {
     @Autowired
     private AppointmentRepository appointmentRepository;
     
+    @Autowired
+    private PatientRepository patientRepository;
+    
+    @Autowired
+    private DoctorRepository doctorRepository;
+    
     public Appointment scheduleAppointment(Appointment appointment) {
+        // Load managed entities from DB to avoid detached entity errors
+        Long patientId = appointment.getPatient().getId();
+        Long doctorId = appointment.getDoctor().getId();
+        Patient patient = patientRepository.findById(patientId)
+            .orElseThrow(() -> new RuntimeException("Patient not found: " + patientId));
+        Doctor doctor = doctorRepository.findById(doctorId)
+            .orElseThrow(() -> new RuntimeException("Doctor not found: " + doctorId));
+        appointment.setPatient(patient);
+        appointment.setDoctor(doctor);
         return appointmentRepository.save(appointment);
     }
     
